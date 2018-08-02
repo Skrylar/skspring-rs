@@ -6,6 +6,7 @@ repository = "https://github.com/Skrylar/skspring-rs"
 license = "BSD-3-Clause"
 description = "Physically-based damped springs model (for animation, mostly.)"
 categories = ["simulation"]
+readme = "README.md"
 
 [dependencies]
 num = "0.2.0"
