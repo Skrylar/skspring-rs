@@ -40,8 +40,7 @@ pub struct DampedSpringController<F> {
 
 impl<F> DampedSpringController<F>
 where
-    F: num::Float,
-    f64: Into<F>
+    F: num::Float + num::cast::FromPrimitive
 {
     /// Performs (somewhat nontrivial) calculations to prepare the
     /// motion of a damped spring. Once initialized, you may update
@@ -49,24 +48,24 @@ where
     /// same object.
     pub fn with_coefficients(delta_time: F, desired_angular_frequency: F, desired_damping_ratio: F) -> DampedSpringController<F> {
         // clamping
-        let damping_ratio     = if desired_damping_ratio     < 0.0.into() { 0.0.into() } else { desired_damping_ratio };
-        let angular_frequency = if desired_angular_frequency < 0.0.into() { 0.0.into() } else { desired_angular_frequency };
+        let damping_ratio     = if desired_damping_ratio     < F::from_f64(0.0).unwrap() { F::from_f64(0.0).unwrap() } else { desired_damping_ratio };
+        let angular_frequency = if desired_angular_frequency < F::from_f64(0.0).unwrap() { F::from_f64(0.0).unwrap() } else { desired_angular_frequency };
 
         // special case: no angular frequency
         if angular_frequency < F::epsilon() {
             DampedSpringController{
-                pos_pos_coef: 1.0.into(),
-                pos_vel_coef: 0.0.into(),
-                vel_pos_coef: 0.0.into(),
-                vel_vel_coef: 1.0.into()}
-        } else if damping_ratio > 1.0.into() + F::epsilon() { // over-damped
+                pos_pos_coef: F::from_f64(1.0).unwrap(),
+                pos_vel_coef: F::from_f64(0.0).unwrap(),
+                vel_pos_coef: F::from_f64(0.0).unwrap(),
+                vel_vel_coef: F::from_f64(1.0).unwrap()}
+        } else if damping_ratio > F::from_f64(1.0).unwrap() + F::epsilon() { // over-damped
             let za = -angular_frequency * damping_ratio;
-            let zb = angular_frequency * Float::sqrt(damping_ratio * damping_ratio - 1.0.into());
+            let zb = angular_frequency * Float::sqrt(damping_ratio * damping_ratio - F::from_f64(1.0).unwrap());
             let z1 = za - zb;
             let z2 = za + zb;
             let e1 = Float::exp(z1 * delta_time);
             let e2 = Float::exp(z2 * delta_time);
-            let inv_two_zb = 1.0.into() / (2.0.into() * zb);
+            let inv_two_zb = F::from_f64(1.0).unwrap() / (F::from_f64(2.0).unwrap() * zb);
             let e1_over_twozb = e1 * inv_two_zb;
             let e2_over_twozb = e2 * inv_two_zb;
             let z1e1_over_twozb = z1 * e1_over_twozb;
@@ -77,13 +76,13 @@ where
                 vel_pos_coef: (z1e1_over_twozb - z2e2_over_twozb + e2) * z2,
                 vel_vel_coef: -z1e1_over_twozb + z2e2_over_twozb
             }
-        } else if damping_ratio < 1.0.into() - F::epsilon() { // under-damped
+        } else if damping_ratio < F::from_f64(1.0).unwrap() - F::epsilon() { // under-damped
             let omega_zeta = angular_frequency * damping_ratio;
-            let alpha = angular_frequency * Float::sqrt(1.0.into() - damping_ratio * damping_ratio);
+            let alpha = angular_frequency * Float::sqrt(F::from_f64(1.0).unwrap() - damping_ratio * damping_ratio);
             let exp_term = Float::exp(-omega_zeta * delta_time);
             let cos_term = Float::cos(alpha * delta_time);
             let sin_term = Float::sin(alpha * delta_time);
-            let inv_alpha = 1.0.into() / alpha;
+            let inv_alpha = F::from_f64(1.0).unwrap() / alpha;
             let exp_sin = exp_term * sin_term;
             let exp_cos = exp_term * cos_term;
             let exp_omega_zeta_sin_over_alpha = exp_term * omega_zeta * sin_term * inv_alpha;
