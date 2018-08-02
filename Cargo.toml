@@ -2,6 +2,10 @@
 name = "skspring-rs"
 version = "0.1.0"
 authors = ["Joshua Cearley <joshua.cearley@gmail.com>"]
+repository = "https://github.com/Skrylar/skspring-rs"
+license = "BSD-3-Clause"
+description = "Physically-based damped springs model (for animation, mostly.)"
+categories = ["simulation"]
 
 [dependencies]
 num = "0.2.0"
